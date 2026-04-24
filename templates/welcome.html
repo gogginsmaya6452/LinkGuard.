@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Successful - VeriScope AI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #05080f;
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .success-card {
+            background: #111625;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid #1e293b;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Green glow effect */
+        .success-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, #00dc82, #3b82f6);
+        }
+
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 220, 130, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            color: #00dc82;
+            font-size: 35px;
+            border: 2px solid #00dc82;
+            box-shadow: 0 0 20px rgba(0, 220, 130, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        h1 { margin-bottom: 10px; font-size: 28px; font-weight: 700; }
+        p { color: #94a3b8; margin-bottom: 30px; font-size: 16px; line-height: 1.5; }
+
+        .user-badge {
+            background: #1a1f36;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 35px;
+            border: 1px solid #2d3748;
+            font-weight: 500;
+        }
+
+        /* Loading Bar Style */
+        .loading-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: #00dc82;
+            width: 0%;
+            transition: width 2s linear; /* Matches the 2 second delay */
+        }
+
+        .btn-continue {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #2d3748;
+            padding: 12px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-continue:hover {
+            border-color: #00dc82;
+            color: #fff;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 220, 130, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 220, 130, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 220, 130, 0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-card">
+        <div class="icon-circle">
+            <i class="fas fa-check"></i>
+        </div>
+        <h1>Login Successful!</h1>
+        <p>Welcome back, <b>{{ session.username }}</b>.<br>Redirecting you to dashboard...</p>
+        
+        <div class="loading-bar">
+            <div class="loading-progress" id="progressBar"></div>
+        </div>
+        
+        <a href="/dashboard" class="btn-continue">
+            Click here if not redirected
+        </a>
+    </div>
+
+    <script>
+        // Start the progress bar animation immediately
+        window.onload = function() {
+            document.getElementById('progressBar').style.width = '100%';
+            
+            // Redirect after 2 seconds (2000 milliseconds)
+            setTimeout(function() {
+                window.location.href = "/dashboard";
+            }, 2000);
+        };
+    </script>
+</body>
+</html>

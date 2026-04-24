@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VeriScope AI | Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root{--bg-body:#0b1120;--bg-panel:#1e293b;--primary:#3b82f6;--text-main:#f8fafc;--text-muted:#94a3b8;--border:rgba(255,255,255,0.08);}
+        body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-body);color:var(--text-main);display:flex;min-height:100vh;margin:0;}
+
+        .sidebar{width:260px;background:rgba(15,23,42,0.95);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;}
+        .logo-area{padding:24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;font-weight:700;font-size:20px;}
+        .nav-menu{padding:24px 16px;flex:1;}
+        .nav-label{font-size:11px;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin:12px 0 12px 12px;}
+        .nav-link{display:flex;align-items:center;gap:12px;padding:14px;color:var(--text-muted);text-decoration:none;border-radius:10px;margin-bottom:4px;font-weight:500;transition:0.2s;}
+        .nav-link:hover{background:rgba(255,255,255,0.05);color:#fff;}
+        .nav-link.active{background:linear-gradient(90deg,rgba(59,130,246,0.15),transparent);color:var(--primary);border-left:3px solid var(--primary);box-shadow:5px 0 15px -5px rgba(59,130,246,0.5);}
+
+        .main-content{flex:1;margin-left:260px;padding:32px;}
+
+        .header{display:flex;justify-content:space-between;margin-bottom:32px;align-items:center;position:relative;z-index:2000;}
+        .top-right{display:flex;align-items:center;gap:24px;position:relative;}
+
+        .avatar{width:40px;height:40px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:16px;cursor:pointer;transition:transform 0.2s;}
+        .avatar:hover{transform:scale(1.1);}
+
+        .profile-popup{display:none;position:absolute;top:55px;right:0;width:300px;background:#1e293b;border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,0.5);z-index:3000;flex-direction:column;align-items:center;text-align:center;animation:fadeIn 0.2s ease-out;}
+        .p-email{font-size:13px;color:var(--text-muted);margin-bottom:15px;}
+        .p-avatar-large{width:70px;height:70px;background:linear-gradient(135deg,var(--primary),#60a5fa);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;margin-bottom:10px;}
+        .p-name{font-size:18px;color:#fff;margin-bottom:20px;font-weight:600;}
+        .p-manage-btn{border:1px solid var(--text-muted);border-radius:20px;padding:8px 20px;color:var(--primary);text-decoration:none;font-size:13px;font-weight:500;margin-bottom:20px;display:inline-block;transition:background 0.2s;}
+        .p-manage-btn:hover{background:rgba(59,130,246,0.1);}
+        .p-divider{width:100%;height:1px;background:var(--border);margin-bottom:15px;}
+        .p-logout-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;background:rgba(239,68,68,0.1);border-radius:8px;color:#ef4444;text-decoration:none;font-size:14px;width:100%;transition:background 0.2s;}
+        .p-logout-btn:hover{background:rgba(239,68,68,0.2);}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+
+        .quick-scan-wrapper{background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(15,23,42,0.5));border:1px solid rgba(59,130,246,0.3);border-radius:16px;padding:24px;display:flex;align-items:center;justify-content:center;margin-bottom:32px;}
+        .scan-form{width:100%;display:flex;gap:12px;}
+        .scan-input{flex:1;background:rgba(0,0,0,0.3);border:1px solid var(--border);padding:16px 24px;border-radius:12px;color:#fff;font-size:16px;outline:none;}
+        .btn-scan{background:var(--primary);color:#fff;border:none;padding:0 40px;border-radius:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;}
+
+        .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:32px;}
+        .card{background:var(--bg-panel);border:1px solid var(--border);border-radius:16px;padding:24px;transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s;}
+        .card:hover{transform:translateY(-5px);box-shadow:0 10px 30px -10px rgba(0,0,0,0.5);border-color:rgba(255,255,255,0.2);}
+        .stat-val{font-size:32px;font-weight:700;margin:10px 0;}
+
+        .dashboard-grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:32px;}
+
+        .table-container{width:100%;border-collapse:collapse;}
+        .table-container th{text-align:left;padding:16px;color:var(--text-muted);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);}
+        .table-container td{padding:16px;border-bottom:1px solid rgba(255,255,255,0.02);font-size:14px;color:#f8fafc;}
+        .table-container tbody tr{transition:background-color 0.2s;}
+        .table-container tbody tr:hover{background-color:rgba(255,255,255,0.03);}
+
+        .status-pill{padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:6px;}
+        .pill-safe{background:rgba(16,185,129,0.15);color:#10b981;}
+        .pill-danger{background:rgba(239,68,68,0.15);color:#ef4444;}
+        .pill-warn{background:rgba(245,158,11,0.15);color:#f59e0b;}
+        .chart-box{height:280px;width:100%;display:flex;align-items:center;justify-content:center;}
+
+        /* ══ GUEST LIMIT POPUP ══ */
+        #vs-limit-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(6px);z-index:99999;align-items:center;justify-content:center;}
+        #vs-limit-overlay.active{display:flex;}
+        .vs-lc{background:#0f172a;border:1px solid rgba(59,130,246,0.35);border-radius:20px;padding:44px 36px 36px;max-width:420px;width:90%;text-align:center;box-shadow:0 0 80px rgba(59,130,246,0.15);animation:vsPopIn .28s cubic-bezier(.34,1.56,.64,1) both;}
+        @keyframes vsPopIn{from{opacity:0;transform:scale(.88) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+        .vs-lc-icon{font-size:3rem;margin-bottom:16px;display:block;}
+        .vs-lc h2{color:#f1f5f9;font-size:1.4rem;font-weight:700;margin-bottom:10px;}
+        .vs-lc p{color:#94a3b8;font-size:.95rem;line-height:1.65;margin-bottom:28px;}
+        .vs-lc p strong{color:#f1f5f9;}
+        .vs-lc-btn{display:block;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-weight:700;font-size:1rem;padding:14px;border-radius:12px;text-decoration:none;margin-bottom:14px;transition:opacity .2s,transform .15s;box-shadow:0 4px 24px rgba(99,102,241,.35);}
+        .vs-lc-btn:hover{opacity:.88;transform:translateY(-2px);}
+        .vs-lc-reg{color:#64748b;font-size:.85rem;}
+        .vs-lc-reg a{color:#3b82f6;text-decoration:none;font-weight:600;}
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo-area"><i class="fas fa-shield-dog" style="color:var(--primary);"></i> VeriScope AI</div>
+        <nav class="nav-menu">
+            <div class="nav-label">MAIN MENU</div>
+            <a href="/dashboard" class="nav-link active"><i class="fas fa-grid-2"></i> Dashboard</a>
+            <a href="/scan" class="nav-link"><i class="fas fa-radar"></i> New Scan</a>
+            <a href="/history" class="nav-link"><i class="fas fa-history"></i> History Log</a>
+            <div class="nav-label" style="margin-top:24px;">SYSTEM</div>
+            <a href="/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/logout" class="nav-link" style="color:#ef4444;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h2>Security Overview</h2>
+            <div class="top-right">
+                <div class="avatar" onclick="toggleProfile()">
+                    {{ (session.username or session.email or 'U')[0].upper() }}
+                </div>
+                <div class="profile-popup" id="profilePopup">
+                    <div class="p-email">{{ session.email if session.email else 'user@veriscope.local' }}</div>
+                    <div class="p-avatar-large">{{ (session.username or session.email or 'U')[0].upper() }}</div>
+                    <div class="p-name">Hi, {{ session.username or session.email or 'User' }}!</div>
+                    <a href="/settings" class="p-manage-btn">Manage Account</a>
+                    <div class="p-divider"></div>
+                    <a href="/logout" class="p-logout-btn"><i class="fas fa-sign-out-alt"></i> Sign out</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-scan-wrapper">
+            <form action="/scan" method="POST" class="scan-form" id="dashScanForm">
+                <input type="text" name="url" placeholder="Enter domain (e.g., google.com)..." class="scan-input" required>
+                <button type="submit" class="btn-scan"><i class="fas fa-bolt"></i> Analyze</button>
+            </form>
+        </div>
+
+        <div class="stats-grid">
+            <div class="card"><div>Total Scans</div><div class="stat-val">{{ stats[0] }}</div></div>
+            <div class="card"><div>Threats Detected</div><div class="stat-val" style="color:#ef4444;">{{ stats[1] }}</div></div>
+            <div class="card"><div>Avg Risk Score</div><div class="stat-val" style="color:#10b981;">{{ stats[2] }}</div></div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3 style="margin-bottom:20px;font-size:16px;">Recent Activity</h3>
+                <table class="table-container">
+                    <thead><tr><th>Target</th><th>Status</th><th>Score</th><th>Report</th></tr></thead>
+                    <tbody>
+                        {% for scan in recent_scans %}
+                        <tr>
+                            <td>{{ scan[1] }}</td>
+                            <td>
+                                {% if scan[2] == 'SAFE' %}<span class="status-pill pill-safe">SAFE</span>
+                                {% elif scan[2] == 'PHISHING' %}<span class="status-pill pill-danger">PHISHING</span>
+                                {% else %}<span class="status-pill pill-warn">SUSPICIOUS</span>{% endif %}
+                            </td>
+                            <td>{{ scan[3] }}</td>
+                            <td><a href="/download_enhanced_report/{{ scan[0] }}" style="color:#94a3b8;"><i class="fas fa-download"></i></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom:20px;font-size:16px;">Threat Distribution</h3>
+                <div class="chart-box"><canvas id="threatChart"></canvas></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ══ GUEST LIMIT POPUP ══ -->
+    <div id="vs-limit-overlay" role="dialog" aria-modal="true">
+        <div class="vs-lc">
+            <span class="vs-lc-icon">🔒</span>
+            <h2>Free Scan Limit Reached</h2>
+            <p>You've used your <strong>2 free scans</strong>.<br>
+            Log in for <strong>unlimited scans</strong>, full history, and forensic reports — all free.</p>
+            <a href="/login" class="vs-lc-btn"><i class="fas fa-sign-in-alt"></i>&nbsp; Login to Continue</a>
+            <p class="vs-lc-reg">No account yet? <a href="/register">Sign up free</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Chart
+        const ctx = document.getElementById('threatChart').getContext('2d');
+        new Chart(ctx, { type: 'doughnut', data: { labels: ['Safe','Suspicious','Phishing'], datasets: [{ data: [{{ threat_dist[0]['1'] }},{{ threat_dist[1]['1'] }},{{ threat_dist[2]['1'] }}], backgroundColor: ['#10b981','#f59e0b','#ef4444'], borderWidth: 0 }] }, options: { maintainAspectRatio: false, cutout: '75%' } });
+
+        // Profile popup
+        function toggleProfile() {
+            const p = document.getElementById('profilePopup');
+            p.style.display = (p.style.display === 'flex') ? 'none' : 'flex';
+        }
+        window.onclick = function(e) {
+            const p = document.getElementById('profilePopup');
+            if (!e.target.closest('.avatar') && !e.target.closest('.profile-popup')) p.style.display = 'none';
+        }
+
+        // ── Limit popup ──
+        function vsShowLimitPopup() {
+            document.getElementById('vs-limit-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        document.getElementById('vs-limit-overlay').addEventListener('click', function(e) {
+            if (e.target === this) { this.classList.remove('active'); document.body.style.overflow = ''; }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') { document.getElementById('vs-limit-overlay').classList.remove('active'); document.body.style.overflow = ''; }
+        });
+
+        function getCookie(n) {
+            const v = document.cookie.split(';').find(c => c.trim().startsWith(n + '='));
+            return v ? parseInt(v.trim().split('=')[1]) : 0;
+        }
+
+        const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+        const limitHit   = getCookie('guest_scans') >= 2;
+
+        if (limitHit && !isLoggedIn) {
+            document.addEventListener('DOMContentLoaded', vsShowLimitPopup);
+            // Intercept the quick scan form on dashboard
+            document.getElementById('dashScanForm').addEventListener('submit', function(e) {
+                e.preventDefault(); vsShowLimitPopup();
+            });
+            // Intercept sidebar New Scan link
+            document.querySelectorAll('a[href="/scan"]').forEach(function(a) {
+                a.addEventListener('click', function(e) { e.preventDefault(); vsShowLimitPopup(); });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriScope AI | About Us</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #0b1120;
+            --bg-panel: #1e293b;
+            --primary: #3b82f6;
+            --accent: #8b5cf6; 
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --gradient-text: linear-gradient(135deg, #60a5fa 0%, #34d399 100%);
+            --gradient-card: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.6));
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- AMBIENT LIGHTS --- */
+        .light-orb { position: fixed; border-radius: 50%; filter: blur(100px); opacity: 0.15; z-index: -1; pointer-events: none; }
+        .orb-1 { width: 500px; height: 500px; top: -150px; right: -100px; background: var(--primary); animation: floatOrb 10s infinite ease-in-out; }
+        .orb-2 { width: 400px; height: 400px; bottom: -50px; left: -100px; background: var(--success); animation: floatOrb 12s infinite ease-in-out reverse; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(30px, 30px); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background: rgba(15, 23, 42, 0.95);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .logo-area {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: white;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .logo-text {
+            font-size: 20px; font-weight: 700;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu { padding: 24px 16px; flex: 1; }
+        
+        .nav-label { 
+            font-size: 11px; text-transform: uppercase; color: var(--text-muted); 
+            font-weight: 700; margin-bottom: 12px; padding-left: 12px; letter-spacing: 0.5px;
+        }
+
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 14px;
+            color: var(--text-muted); text-decoration: none; border-radius: 10px;
+            margin-bottom: 4px; transition: all 0.3s ease; font-weight: 500;
+        }
+
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: #fff; transform: translateX(5px); }
+        
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), transparent);
+            color: var(--primary); border-left: 3px solid var(--primary);
+            animation: pulse-blue 2s infinite;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            margin-left: 260px; /* Sidebar width */
+            padding: 50px 60px; /* Adjusted padding for better spacing */
+            max-width: 1600px; /* Max width to prevent stretching on huge screens */
+            position: relative;
+            margin: 0 auto; /* Center content if it hits max-width */
+            padding-left: 320px; /* Push content away from fixed sidebar */
+        }
+
+        /* HEADER */
+        .header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px;
+        }
+        .page-title h2 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+        .page-title p { color: var(--text-muted); font-size: 15px; margin: 0; }
+
+        .top-nav { display: flex; align-items: center; gap: 20px; }
+        
+        .about-btn { 
+            color: var(--primary); text-decoration: none; font-weight: 600; font-size: 14px; 
+            transition: 0.2s; padding: 10px 20px; border-radius: 10px;
+            background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
+        }
+        .about-btn:hover { background: rgba(59, 130, 246, 0.2); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+        
+        .user-profile { display: flex; align-items: center; gap: 16px; }
+
+        .avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--success), var(--primary));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 18px; color: #fff;
+            border: 2px solid var(--bg-panel);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .avatar:hover { transform: scale(1.1); }
+
+        /* --- ABOUT CONTAINER --- */
+        .about-container {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.6));
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .about-container::before {
+            content: ''; position: absolute; width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent 70%);
+            top: -100px; right: -100px; border-radius: 50%; pointer-events: none;
+        }
+
+        .about-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Balanced 50/50 split */
+            min-height: 500px;
+        }
+
+        .about-text-content {
+            padding: 60px 50px; /* Refined padding */
+            display: flex; flex-direction: column; justify-content: center;
+            z-index: 1;
+        }
+
+        .gradient-heading {
+            font-size: 48px; 
+            margin-bottom: 24px; 
+            background: var(--gradient-text);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-weight: 800; letter-spacing: -1.5px; line-height: 1.1;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        }
+
+        .about-image-content {
+            background-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover; background-position: center; position: relative;
+            border-left: 1px solid var(--border);
+        }
+
+        .about-image-content::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, var(--bg-panel) 0%, rgba(11, 17, 32, 0.6) 20%, transparent 100%);
+        }
+
+        .lead-text { 
+            font-size: 18px; line-height: 1.7; color: #e2e8f0; 
+            margin-bottom: 24px; font-weight: 400; max-width: 550px;
+        }
+
+        .secondary-text {
+            font-size: 15px; color: var(--text-muted); line-height: 1.7; max-width: 550px;
+        }
+
+        /* FEATURES GRID */
+        .feature-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
+            padding: 60px 50px; /* Balanced with text content */
+            background: rgba(15, 23, 42, 0.3);
+            border-top: 1px solid var(--border);
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 35px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease;
+        }
+        .feature-card:hover::before { transform: scaleX(1); }
+
+        .feature-icon { 
+            width: 54px; height: 54px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #60a5fa; font-size: 24px; margin-bottom: 24px; 
+            transition: 0.3s;
+        }
+        
+        .feature-card:hover .feature-icon {
+            background: var(--primary); color: #fff;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .feature-card h3 { font-size: 20px; margin-bottom: 12px; color: #fff; font-weight: 700; }
+        .feature-card p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+
+    </style>
+</head>
+<body>
+
+    <div class="light-orb orb-1"></div>
+    <div class="light-orb orb-2"></div>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-shield-dog"></i></div>
+            <span class="logo-text">VeriScope AI</span>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="nav-label">Main Menu</div>
+            <a href="/dashboard" class="nav-link">
+                <i class="fas fa-grid-2"></i> <span>Dashboard</span>
+            </a>
+            <a href="/scan" class="nav-link">
+                <i class="fas fa-radar"></i> <span>New Scan</span>
+            </a>
+            <a href="/history" class="nav-link">
+                <i class="fas fa-history"></i> <span>History Log</span>
+            </a>
+            
+            <div class="nav-label" style="margin-top: 24px;">System</div>
+            <a href="/settings" class="nav-link">
+                <i class="fas fa-cog"></i> <span>Settings</span>
+            </a>
+            <a href="/logout" class="nav-link" style="color: var(--danger);">
+                <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="header">
+            <div class="page-title">
+                <h2>Our Mission</h2>
+                <p>Building a safer internet, one URL at a time.</p>
+            </div>
+            
+            <div class="top-nav">
+                <a href="/about" class="about-btn"><i class="fas fa-info-circle"></i> About</a>
+                
+                <div class="user-profile">
+                    <div class="avatar">{{ session.username[0].upper() }}</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="about-container">
+            <div class="about-hero">
+                <div class="about-text-content">
+                    <h1 class="gradient-heading">
+                        Securing Your<br>Digital Horizon.
+                    </h1>
+                    <p class="lead-text">
+                        VeriScope AI was born from a critical need: the ability to instantly verify the safety of any URL in an increasingly hostile online environment.
+                    </p>
+                    <p class="secondary-text">
+                        We leverage advanced AI heuristics, real-time domain age data, and global threat intelligence to provide a comprehensive risk score. Whether you are an individual user wary of a strange link or an enterprise protecting your network, VeriScope provides the clarity you need to click with confidence.
+                    </p>
+                </div>
+                <div class="about-image-content"></div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                    <h3>AI-Powered Analysis</h3>
+                    <p>Our engine detects subtle typosquatting patterns, homograph attacks, and suspicious keywords often missed by traditional filters.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-database"></i></div>
+                    <h3>Real-Time Intelligence</h3>
+                    <p>We query live WHOIS data to determine domain age—a critical factor in identifying "burner" phishing sites used in zero-day attacks.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-file-contract"></i></div>
+                    <h3>Detailed Reporting</h3>
+                    <p>Generate professional PDF reports for compliance obligations or to share actionable threat intelligence with your security team.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</body>
+</html>

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account – VeriScope AI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --cyan:   #00f5ff;
+            --blue:   #0066ff;
+            --green:  #00ff88;
+            --red:    #ff2244;
+            --bg:     #020810;
+            --panel:  rgba(4, 16, 32, 0.88);
+            --border: rgba(0, 245, 255, 0.18);
+            --text:   #cce8ff;
+            --dim:    rgba(150, 200, 255, 0.5);
+            --muted:  rgba(100, 150, 200, 0.35);
+            --mono:   'Share Tech Mono', monospace;
+            --head:   'Rajdhani', sans-serif;
+        }
+
+        html {
+            min-height: 100%;
+        }
+
+        body {
+            font-family: var(--head);
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            /* removed overflow: hidden */
+            overflow-y: auto;
+            padding: 80px 24px 60px;
+            position: relative;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Corner brackets */
+        .corner {
+            position: fixed; width: 60px; height: 60px; z-index: 2; opacity: 0.4;
+        }
+        .corner::before, .corner::after { content: ''; position: absolute; background: var(--cyan); }
+        .corner::before { width: 2px; height: 100%; }
+        .corner::after  { width: 100%; height: 2px; }
+        .corner.tl { top: 16px; left: 16px; }
+        .corner.tr { top: 16px; right: 16px; transform: scaleX(-1); }
+        .corner.bl { bottom: 16px; left: 16px; transform: scaleY(-1); }
+        .corner.br { bottom: 16px; right: 16px; transform: scale(-1); }
+
+        .threat-hud {
+            position: fixed; top: 20px; right: 20px;
+            font-family: 'Share Tech Mono', monospace; font-size: 10px;
+            color: rgba(0,245,255,0.3); text-align: right; z-index: 2;
+            line-height: 1.9; letter-spacing: 1px;
+        }
+        .threat-hud .val    { color: rgba(0,255,136,0.5); }
+        .threat-hud .danger { color: rgba(255,34,68,0.5); }
+
+        .hud-bar {
+            position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+            font-family: 'Share Tech Mono', monospace; font-size: 10px;
+            color: rgba(0,245,255,0.25); letter-spacing: 2px; z-index: 2; white-space: nowrap;
+        }
+
+        /* Form card */
+        .form-wrap {
+            position: relative; z-index: 10; perspective: 1200px;
+            width: 100%; max-width: 430px;
+            /* allow it to grow and be scrollable */
+            margin: auto 0;
+        }
+
+        .form-card {
+            width: 100%;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 40px 38px 34px;
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            box-shadow:
+                0 0 0 1px rgba(0,245,255,0.05),
+                0 0 100px rgba(0,100,255,0.1),
+                0 40px 80px rgba(0,0,0,0.7),
+                inset 0 1px 0 rgba(0,245,255,0.1);
+            animation: cardIn 0.9s cubic-bezier(0.16,1,0.3,1) both;
+            transform-style: preserve-3d;
+            transition: transform 0.12s ease-out;
+            position: relative;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(40px) rotateX(10deg); }
+            to   { opacity: 1; transform: translateY(0) rotateX(0deg); }
+        }
+        .form-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 10%; right: 10%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            opacity: 0.5;
+        }
+        .form-card::after {
+            content: ''; position: absolute;
+            bottom: 0; left: 20%; right: 20%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,100,255,0.4), transparent);
+        }
+
+        /* Logo */
+        .logo-wrap {
+            text-align: center; margin-bottom: 26px;
+            animation: fadeUp 0.6s 0.2s both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .shield-3d {
+            width: 58px; height: 58px; margin: 0 auto 12px;
+            position: relative;
+            animation: shieldFloat 4s ease-in-out infinite;
+        }
+        @keyframes shieldFloat {
+            0%,100% { transform: translateY(0) rotateY(0deg); }
+            33%     { transform: translateY(-5px) rotateY(10deg); }
+            66%     { transform: translateY(-2px) rotateY(-8deg); }
+        }
+        .shield-3d svg {
+            width: 58px; height: 58px;
+            filter: drop-shadow(0 0 12px rgba(0,245,255,0.65)) drop-shadow(0 0 36px rgba(0,100,255,0.4));
+        }
+        .shield-ring {
+            position: absolute; border-radius: 50%;
+            border: 1px solid rgba(0,245,255,0.2);
+            animation: pulseRing 2.5s ease-out infinite;
+        }
+        .shield-ring.r1 { inset: -10px; }
+        .shield-ring.r2 { inset: -22px; animation-delay: 0.85s; }
+        @keyframes pulseRing {
+            0%   { opacity: 0.5; transform: scale(0.9); }
+            100% { opacity: 0;   transform: scale(1.5); }
+        }
+        .logo-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 4px;
+        }
+        .logo-title span { color: var(--cyan); }
+        .logo-sub {
+            font-family: 'Share Tech Mono', monospace; font-size: 10px;
+            color: var(--dim); letter-spacing: 3px; margin-top: 4px;
+        }
+
+        /* Alert */
+        .alert {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 10px 13px; border-radius: 3px;
+            font-family: 'Share Tech Mono', monospace; font-size: 12px;
+            line-height: 1.5; margin-bottom: 16px; letter-spacing: 0.5px;
+        }
+        .alert-error {
+            background: rgba(255,34,68,0.08);
+            border: 1px solid rgba(255,34,68,0.25);
+            color: rgba(255,100,120,0.9);
+        }
+
+        /* Section label */
+        .section-label {
+            font-family: 'Share Tech Mono', monospace; font-size: 10px;
+            color: rgba(0,245,255,0.4); letter-spacing: 3px; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 10px;
+            animation: fadeUp 0.6s 0.3s both;
+        }
+        .section-label::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, rgba(0,245,255,0.2), transparent);
+        }
+
+        /* Fields */
+        .field { margin-bottom: 14px; animation: fadeUp 0.5s both; }
+        .field:nth-child(1) { animation-delay: 0.35s; }
+        .field:nth-child(2) { animation-delay: 0.42s; }
+        .field:nth-child(3) { animation-delay: 0.49s; }
+
+        .field label {
+            display: block; font-family: 'Share Tech Mono', monospace;
+            font-size: 10px; color: rgba(0,245,255,0.45); letter-spacing: 2px;
+            text-transform: uppercase; margin-bottom: 7px;
+        }
+        .input-wrap { position: relative; }
+        .input-wrap i.icon {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            color: rgba(0,200,255,0.3); font-size: 12px; pointer-events: none;
+        }
+        .field input {
+            width: 100%; padding: 11px 38px 11px 36px;
+            background: rgba(0,10,30,0.7);
+            border: 1px solid rgba(0,100,200,0.25);
+            border-radius: 3px; color: var(--text);
+            font-size: 14px; font-family: 'Rajdhani', sans-serif; font-weight: 500;
+            outline: none;
+            transition: border-color 0.18s, box-shadow 0.18s;
+        }
+        .field input:focus {
+            border-color: rgba(0,245,255,0.45);
+            box-shadow: 0 0 0 3px rgba(0,245,255,0.07), 0 0 20px rgba(0,245,255,0.05);
+        }
+        .field input.valid   { border-color: rgba(0,255,136,0.4); }
+        .field input.invalid { border-color: rgba(255,34,68,0.45); }
+        .field input::placeholder { color: rgba(100,150,200,0.3); font-family: 'Share Tech Mono', monospace; font-size: 12px; }
+
+        .toggle-pw {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            color: rgba(0,200,255,0.3); cursor: pointer; font-size: 12px;
+            transition: color 0.15s;
+        }
+        .toggle-pw:hover { color: var(--cyan); }
+
+        .field-hint { font-family: 'Share Tech Mono', monospace; font-size: 11px; margin-top: 5px; min-height: 14px; letter-spacing: 0.5px; }
+        .field-hint.ok  { color: rgba(0,255,136,0.7); }
+        .field-hint.bad { color: rgba(255,34,68,0.8); }
+
+        /* Strength bar */
+        .strength-bar {
+            height: 3px; border-radius: 2px;
+            background: rgba(0,100,200,0.15); margin-top: 8px; overflow: hidden;
+        }
+        .strength-fill { height: 100%; border-radius: 2px; width: 0; transition: width 0.3s, background 0.3s; }
+        .strength-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--dim); margin-top: 4px; letter-spacing: 1px; }
+
+        /* Criteria grid */
+        .criteria {
+            background: rgba(0,10,30,0.7);
+            border: 1px solid rgba(0,100,200,0.2);
+            border-radius: 3px; padding: 10px 13px; margin-top: 8px;
+            display: none; grid-template-columns: 1fr 1fr; gap: 6px 16px;
+        }
+        .criteria.show { display: grid; }
+        .criterion {
+            display: flex; align-items: center; gap: 7px;
+            font-family: 'Share Tech Mono', monospace; font-size: 11px;
+            color: rgba(100,150,200,0.4); transition: color 0.2s; letter-spacing: 0.5px;
+        }
+        .criterion i { font-size: 9px; width: 11px; }
+        .criterion.met   { color: rgba(0,255,136,0.7); }
+        .criterion.unmet { color: rgba(100,150,200,0.35); }
+
+        /* Submit button */
+        .btn-submit {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, rgba(0,100,255,0.3), rgba(0,245,255,0.2));
+            border: 1px solid rgba(0,245,255,0.35);
+            border-radius: 3px; color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+            cursor: pointer; margin-top: 10px;
+            transition: all 0.22s;
+            box-shadow: 0 0 24px rgba(0,100,255,0.18);
+            animation: fadeUp 0.6s 0.56s both;
+            position: relative; overflow: hidden;
+        }
+        .btn-submit::after {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,245,255,0.08), transparent);
+            transition: left 0.5s;
+        }
+        .btn-submit:not(:disabled):hover {
+            background: linear-gradient(135deg, rgba(0,100,255,0.5), rgba(0,245,255,0.32));
+            box-shadow: 0 0 36px rgba(0,245,255,0.2);
+        }
+        .btn-submit:not(:disabled):hover::after { left: 160%; }
+        .btn-submit:not(:disabled):active { transform: scale(0.99); }
+        .btn-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .form-footer {
+            text-align: center; margin-top: 18px;
+            font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--dim);
+            animation: fadeUp 0.6s 0.62s both;
+        }
+        .form-footer a { color: var(--cyan); text-decoration: none; transition: all 0.2s; }
+        .form-footer a:hover { color: #fff; text-shadow: 0 0 10px var(--cyan); }
+
+        /* Responsive: on very small screens, reduce side padding */
+        @media (max-width: 480px) {
+            body { padding: 70px 12px 50px; }
+            .form-card { padding: 32px 20px 28px; }
+            .threat-hud { display: none; }
+            .hud-bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="threat-hud">
+    <div>SYSTEM&nbsp;&nbsp;<span class="val">SECURE</span></div>
+    <div>THREATS&nbsp;<span class="danger" id="hud-threats">0</span></div>
+    <div>UPTIME&nbsp;&nbsp;<span class="val" id="hud-uptime">00:00:00</span></div>
+</div>
+<div class="hud-bar">VERISCOPE AI · PHISHING DETECTION SYSTEM · v2.1.4 · AES-256 ENCRYPTED</div>
+
+<div class="form-wrap">
+    <div class="form-card" id="formCard">
+
+        <div class="logo-wrap">
+            <div class="shield-3d">
+                <div class="shield-ring r1"></div>
+                <div class="shield-ring r2"></div>
+                <svg viewBox="0 0 24 24" fill="none">
+                    <defs>
+                        <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00f5ff"/>
+                            <stop offset="100%" stop-color="#0066ff"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="url(#sg2)" opacity="0.9"/>
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="none" stroke="rgba(0,245,255,0.4)" stroke-width="0.5"/>
+                    <path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="logo-title">Veri<span>Scope</span></div>
+            <div class="logo-sub">CREATE SECURE ACCOUNT</div>
+        </div>
+
+        <div class="section-label">NEW OPERATOR</div>
+
+        <form method="POST" action="/register" id="regForm" novalidate autocomplete="off">
+
+            <div class="field">
+                <label for="username">Username</label>
+                <div class="input-wrap">
+                    <i class="fas fa-user icon"></i>
+                    <input type="text" id="username" name="username"
+                           placeholder="choose_username" required autocomplete="off">
+                </div>
+                <div class="field-hint" id="uname-hint"></div>
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock icon"></i>
+                    <input type="password" id="password" name="password"
+                           placeholder="create_strong_password" required autocomplete="new-password">
+                    <i class="fas fa-eye toggle-pw" id="togglePw1"></i>
+                </div>
+                <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                <div class="strength-label" id="strengthLabel"></div>
+                <div class="criteria" id="criteriaGrid">
+                    <div class="criterion unmet" id="c-len"><i class="fas fa-circle"></i> 8+ chars</div>
+                    <div class="criterion unmet" id="c-up"><i class="fas fa-circle"></i> Uppercase A-Z</div>
+                    <div class="criterion unmet" id="c-lo"><i class="fas fa-circle"></i> Lowercase a-z</div>
+                    <div class="criterion unmet" id="c-num"><i class="fas fa-circle"></i> Number 0-9</div>
+                    <div class="criterion unmet" id="c-sp"><i class="fas fa-circle"></i> Special char</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="confirm">Confirm Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock icon"></i>
+                    <input type="password" id="confirm"
+                           placeholder="repeat_password" required autocomplete="new-password">
+                    <i class="fas fa-eye toggle-pw" id="togglePw2"></i>
+                </div>
+                <div class="field-hint" id="confirm-hint"></div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                <i class="fas fa-user-plus" style="margin-right:8px"></i>CREATE ACCOUNT
+            </button>
+        </form>
+
+        <div class="form-footer">Already have an account? <a href="/login">Sign in →</a></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx    = canvas.getContext('2d');
+    let W, H;
+    const COLS = 14, ROWS = 9;
+    let nodes = [], particles = [], scanY = 0;
+
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function initGrid() {
+        nodes = [];
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                nodes.push({
+                    x3: (c / (COLS - 1) - 0.5) * 2,
+                    y3: (r / (ROWS - 1) - 0.5) * 1.2,
+                    z3: 0,
+                    phase: Math.random() * Math.PI * 2,
+                    speed: 0.3 + Math.random() * 0.4,
+                    active: Math.random() < 0.14
+                });
+            }
+        }
+    }
+
+    function project(x3, y3, z3, t) {
+        const fov = 1.8;
+        const ry  = Math.sin(t * 0.00025) * 0.1;
+        const x2  = x3 * Math.cos(ry) - z3 * Math.sin(ry);
+        const z2  = x3 * Math.sin(ry) + z3 * Math.cos(ry);
+        const sc  = fov / (fov + z2 + 1);
+        return { x: W * 0.5 + x2 * W * 0.46 * sc, y: H * 0.5 + (y3 + z2 * 0.16) * H * 0.43 * sc, s: sc };
+    }
+
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < 30; i++) {
+            particles.push({
+                x: Math.random() * 1920, y: Math.random() * 1080,
+                size: 3 + Math.random() * 9,
+                vx: (Math.random() - 0.5) * 0.28,
+                vy: -0.18 - Math.random() * 0.4,
+                alpha: 0.07 + Math.random() * 0.15,
+                hex: Math.random() < 0.55,
+                rot: Math.random() * Math.PI
+            });
+        }
+    }
+
+    function drawHex(x, y, r, rot) {
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+            const a = rot + i * Math.PI / 3;
+            i === 0 ? ctx.moveTo(x + r * Math.cos(a), y + r * Math.sin(a))
+                    : ctx.lineTo(x + r * Math.cos(a), y + r * Math.sin(a));
+        }
+        ctx.closePath();
+    }
+
+    function draw(t) {
+        ctx.clearRect(0, 0, W, H);
+        const bg = ctx.createRadialGradient(W*.5,H*.38,0, W*.5,H*.38,W*.72);
+        bg.addColorStop(0, 'rgba(0,20,50,0.96)');
+        bg.addColorStop(.5,'rgba(2,8,22,0.98)');
+        bg.addColorStop(1, 'rgba(2,6,16,1)');
+        ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+        for (let i = 0; i < nodes.length; i++) {
+            const n  = nodes[i];
+            const wv = Math.sin(t * 0.001 * n.speed + n.phase) * 0.08;
+            const p  = project(n.x3, n.y3 + wv, n.z3, t);
+            const col = i % COLS, row = Math.floor(i / COLS);
+
+            if (col < COLS - 1) {
+                const n2 = nodes[i+1];
+                const p2 = project(n2.x3, n2.y3 + Math.sin(t*.001*n2.speed+n2.phase)*.08, n2.z3, t);
+                const g  = ctx.createLinearGradient(p.x,p.y,p2.x,p2.y);
+                g.addColorStop(0, `rgba(0,245,255,${.044*p.s})`);
+                g.addColorStop(1, `rgba(0,100,255,${.044*p2.s})`);
+                ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y);
+                ctx.strokeStyle = g; ctx.lineWidth = 0.5; ctx.stroke();
+            }
+            if (row < ROWS - 1) {
+                const n2 = nodes[i+COLS];
+                const p2 = project(n2.x3, n2.y3 + Math.sin(t*.001*n2.speed+n2.phase)*.08, n2.z3, t);
+                ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y);
+                ctx.strokeStyle = `rgba(0,80,200,${.037*p.s})`; ctx.lineWidth = 0.5; ctx.stroke();
+            }
+
+            const nr = (n.active ? 3 : 1.5) * p.s;
+            if (n.active) {
+                const gw = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,nr*5);
+                gw.addColorStop(0,`rgba(0,245,255,${.45*p.s})`); gw.addColorStop(1,'transparent');
+                ctx.beginPath(); ctx.arc(p.x,p.y,nr*4.5,0,Math.PI*2); ctx.fillStyle=gw; ctx.fill();
+            }
+            ctx.beginPath(); ctx.arc(p.x,p.y,nr,0,Math.PI*2);
+            ctx.fillStyle = n.active ? `rgba(0,245,255,${.85*p.s})` : `rgba(0,100,255,${.28*p.s})`;
+            ctx.fill();
+        }
+
+        const pp = (t*.00038)%1, pi = Math.floor(pp*(COLS-1)), row = Math.floor(t*.00019)%ROWS;
+        if (pi < COLS-1) {
+            const n1=nodes[row*COLS+pi], n2=nodes[row*COLS+pi+1];
+            const frac=(pp*(COLS-1))-pi;
+            const p1=project(n1.x3,n1.y3+Math.sin(t*.001*n1.speed+n1.phase)*.08,n1.z3,t);
+            const p2=project(n2.x3,n2.y3+Math.sin(t*.001*n2.speed+n2.phase)*.08,n2.z3,t);
+            const px=p1.x+(p2.x-p1.x)*frac, py=p1.y+(p2.y-p1.y)*frac;
+            const gw=ctx.createRadialGradient(px,py,0,px,py,12);
+            gw.addColorStop(0,'rgba(0,255,136,0.85)'); gw.addColorStop(1,'transparent');
+            ctx.beginPath(); ctx.arc(px,py,12,0,Math.PI*2); ctx.fillStyle=gw; ctx.fill();
+            ctx.beginPath(); ctx.arc(px,py,3,0,Math.PI*2); ctx.fillStyle='#00ff88'; ctx.fill();
+        }
+
+        particles.forEach(p => {
+            p.x+=p.vx; p.y+=p.vy; p.rot+=0.004;
+            if (p.y<-20) { p.y=H+20; p.x=Math.random()*W; }
+            ctx.save(); ctx.globalAlpha=p.alpha; ctx.strokeStyle='#00f5ff'; ctx.lineWidth=0.7;
+            if (p.hex) { drawHex(p.x,p.y,p.size,p.rot); ctx.stroke(); }
+            else {
+                ctx.beginPath();
+                ctx.moveTo(p.x-p.size,p.y); ctx.lineTo(p.x+p.size,p.y);
+                ctx.moveTo(p.x,p.y-p.size); ctx.lineTo(p.x,p.y+p.size);
+                ctx.stroke();
+            }
+            ctx.restore();
+        });
+
+        scanY=(scanY+0.6)%H;
+        const sg=ctx.createLinearGradient(0,scanY-70,0,scanY+4);
+        sg.addColorStop(0,'transparent'); sg.addColorStop(.8,'rgba(0,245,255,0.02)'); sg.addColorStop(1,'rgba(0,245,255,0.05)');
+        ctx.fillStyle=sg; ctx.fillRect(0,scanY-70,W,74);
+
+        const vig=ctx.createRadialGradient(W/2,H/2,H*.28,W/2,H/2,H*.88);
+        vig.addColorStop(0,'transparent'); vig.addColorStop(1,'rgba(0,0,0,0.62)');
+        ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+
+        requestAnimationFrame(draw);
+    }
+
+    initGrid(); initParticles(); requestAnimationFrame(draw);
+})();
+
+/* ── 3D card tilt ─────────────────────────────── */
+const formCard = document.getElementById('formCard');
+document.addEventListener('mousemove', e => {
+    const r = formCard.getBoundingClientRect();
+    const dx = (e.clientX-(r.left+r.width/2))/(window.innerWidth/2);
+    const dy = (e.clientY-(r.top+r.height/2))/(window.innerHeight/2);
+    formCard.style.transform = `rotateY(${dx*4}deg) rotateX(${-dy*3}deg)`;
+});
+document.addEventListener('mouseleave', () => { formCard.style.transform = ''; });
+
+/* ── HUD ─────────────────────────────────────── */
+let threats = Math.floor(Math.random()*900)+300;
+const startTs = Date.now();
+document.getElementById('hud-threats').textContent = threats.toLocaleString();
+setInterval(() => {
+    const e=Date.now()-startTs;
+    document.getElementById('hud-uptime').textContent =
+        `${String(Math.floor(e/3600000)).padStart(2,'0')}:${String(Math.floor((e%3600000)/60000)).padStart(2,'0')}:${String(Math.floor((e%60000)/1000)).padStart(2,'0')}`;
+    if (Math.random()<0.04) { threats++; document.getElementById('hud-threats').textContent=threats.toLocaleString(); }
+},1000);
+
+/* ── Form validation ────────────────────────── */
+function pwToggle(btnId, inputId) {
+    document.getElementById(btnId).addEventListener('click', function() {
+        const inp = document.getElementById(inputId);
+        const hidden = inp.type === 'password';
+        inp.type = hidden ? 'text' : 'password';
+        this.classList.toggle('fa-eye', !hidden);
+        this.classList.toggle('fa-eye-slash', hidden);
+    });
+}
+pwToggle('togglePw1','password');
+pwToggle('togglePw2','confirm');
+
+const unameInput = document.getElementById('username');
+const unameHint  = document.getElementById('uname-hint');
+unameInput.addEventListener('input', function() {
+    const v = this.value.trim();
+    if (!v)             { setHint(unameHint,'','');                          setIS(this,''); }
+    else if (v.length<3){ setHint(unameHint,'bad','// min 3 characters');    setIS(this,'invalid'); }
+    else if (/\s/.test(v)){ setHint(unameHint,'bad','// no spaces allowed'); setIS(this,'invalid'); }
+    else                { setHint(unameHint,'ok','');                         setIS(this,'valid'); }
+    checkForm();
+});
+
+function setHint(el,cls,msg){ el.textContent=msg; el.className='field-hint'+(cls?' '+cls:''); }
+function setIS(el,cls){ el.classList.remove('valid','invalid'); if(cls) el.classList.add(cls); }
+
+const pwInput      = document.getElementById('password');
+const confirmInput = document.getElementById('confirm');
+const strengthFill = document.getElementById('strengthFill');
+const strengthLabel= document.getElementById('strengthLabel');
+const criteriaGrid = document.getElementById('criteriaGrid');
+const confirmHint  = document.getElementById('confirm-hint');
+const submitBtn    = document.getElementById('submitBtn');
+
+const rules = {
+    'c-len': v=>v.length>=8,
+    'c-up':  v=>/[A-Z]/.test(v),
+    'c-lo':  v=>/[a-z]/.test(v),
+    'c-num': v=>/[0-9]/.test(v),
+    'c-sp':  v=>/[^A-Za-z0-9]/.test(v),
+};
+const levels = [
+    {color:'#ff2244',label:'WEAK',    w:'20%'},
+    {color:'#d29922',label:'FAIR',    w:'40%'},
+    {color:'#d29922',label:'MODERATE',w:'60%'},
+    {color:'#00ff88',label:'GOOD',    w:'80%'},
+    {color:'#00ff88',label:'STRONG ✓',w:'100%'},
+];
+
+pwInput.addEventListener('input', function() {
+    const v=this.value;
+    if (v.length>0) criteriaGrid.classList.add('show');
+    let passed=0;
+    for (const [id,fn] of Object.entries(rules)) {
+        const el=document.getElementById(id), ok=fn(v);
+        el.className='criterion '+(ok?'met':'unmet');
+        el.querySelector('i').className='fas '+(ok?'fa-check-circle':'fa-circle');
+        if(ok) passed++;
+    }
+    const lv=levels[Math.max(0,passed-1)];
+    strengthFill.style.width      = passed===0?'0':lv.w;
+    strengthFill.style.background = lv.color;
+    strengthLabel.textContent     = passed===0?'':lv.label;
+    strengthLabel.style.color     = lv.color;
+    validateConfirm(); checkForm();
+});
+
+confirmInput.addEventListener('input', ()=>{ validateConfirm(); checkForm(); });
+
+function validateConfirm() {
+    const ok = pwInput.value===confirmInput.value && confirmInput.value.length>0;
+    if (!confirmInput.value){ setHint(confirmHint,'',''); setIS(confirmInput,''); return; }
+    setHint(confirmHint, ok?'ok':'bad', ok?'// passwords match':'// passwords do not match');
+    setIS(confirmInput, ok?'valid':'invalid');
+}
+
+function allMet(v){ return Object.values(rules).every(fn=>fn(v)); }
+function checkForm(){
+    const u=unameInput.value.trim();
+    submitBtn.disabled = !(u.length>=3 && !/\s/.test(u) && allMet(pwInput.value) && pwInput.value===confirmInput.value && confirmInput.value.length>0);
+}
+
+document.getElementById('regForm').addEventListener('submit', function(e){
+    if (pwInput.value!==confirmInput.value){ e.preventDefault(); setHint(confirmHint,'bad','// passwords do not match'); }
+});
+</script>
+</body>
+</html>

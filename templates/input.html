@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Scan - VeriScope AI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --bg-color: #05080f; 
+            --card-bg: #111625; 
+            --primary-green: #65dba0;
+            --danger-red: #ff4b4b; 
+            --warning: #f59e0b;
+            --text-main: #ffffff; 
+            --text-sub: #94a3b8; 
+            --border-color: #1e293b; 
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            margin: 0; 
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-main); 
+            display: flex; 
+            min-height: 100vh; 
+            background: linear-gradient(135deg, #0a0f1a 0%, #111827 25%, #1a1f36 50%, #0f172a 75%, #05080f 100%);
+            position: relative;
+            overflow-y: auto; 
+            overflow-x: hidden;
+        }
+
+        /* --- BACKGROUND ANIMATIONS --- */
+        .light-effects { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .light-beam { position: fixed; height: 1px; background: linear-gradient(90deg, transparent, rgba(101, 219, 160, 0.3), rgba(219, 101, 136, 0.3), rgba(59, 130, 246, 0.3), transparent); filter: blur(1px); z-index: -1; animation: beamFlow 15s infinite linear; }
+        .light-beam-1 { top: 25%; width: 100%; animation-delay: 0s; transform: rotateX(45deg) translateZ(-250px); }
+        .light-beam-2 { top: 50%; width: 100%; animation-delay: -7.5s; transform: rotateX(-45deg) translateZ(-350px); }
+        @keyframes beamFlow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        
+        .light-orb { position: absolute; border-radius: 50%; filter: blur(40px); opacity: 0.3; animation: orbFloat 20s infinite ease-in-out; }
+        .light-orb-1 { width: 400px; height: 400px; top: -150px; left: -150px; background: radial-gradient(circle, rgba(101, 219, 160, 0.5), transparent 70%); }
+        .light-orb-2 { width: 350px; height: 350px; bottom: -100px; right: -100px; background: radial-gradient(circle, rgba(219, 101, 136, 0.4), transparent 70%); }
+        @keyframes orbFloat { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(50px, 50px) scale(1.1); } }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background: rgba(15, 23, 42, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo-area {
+            padding: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex; align-items: center; gap: 12px;
+            font-weight: 700; font-size: 20px;
+            background: linear-gradient(135deg, var(--primary-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo-area i { font-size: 22px; color: var(--primary-green); -webkit-text-fill-color: initial; }
+
+        .nav-menu { padding: 24px 16px; flex: 1; }
+        .nav-label { font-size: 11px; text-transform: uppercase; color: var(--text-sub); font-weight: 700; margin-bottom: 12px; padding-left: 12px; letter-spacing: 1px; }
+
+        .nav-link {
+            display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+            color: var(--text-sub); text-decoration: none; border-radius: 10px;
+            margin-bottom: 6px; font-weight: 500; font-size: 14px; transition: all 0.3s ease;
+        }
+        .nav-link:hover { background: rgba(255, 255, 255, 0.05); color: #fff; transform: translateX(5px); }
+        
+        /* ADDED: Pulse Animation Keyframes */
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(101, 219, 160, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(101, 219, 160, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(101, 219, 160, 0); }
+        }
+
+        /* ADDED: Animation to active link */
+        .nav-link.active { 
+            background: linear-gradient(90deg, rgba(101, 219, 160, 0.15), transparent); 
+            color: var(--primary-green); 
+            border-left: 3px solid var(--primary-green);
+            animation: pulse-green 2s infinite; /* Pulse Effect */
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1; 
+            margin-left: 260px; 
+            padding: 40px;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh;
+            perspective: 1000px;
+        }
+
+        /* --- HEADER & POPUP --- */
+        .header {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 2000;
+        }
+        
+        /* ABOUT LINK REMOVED */
+        
+        .avatar {
+            width: 40px; height: 40px; 
+            background: linear-gradient(135deg, var(--primary-green), #60a5fa);
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 16px; color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        .avatar:hover { transform: scale(1.1); }
+
+        /* --- GOOGLE STYLE PROFILE POPUP --- */
+        .profile-popup {
+            display: none;
+            position: absolute;
+            top: 55px;
+            right: 0;
+            width: 350px;
+            background: #202124;
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            z-index: 3000;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid #3c4043;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        .p-email { font-size: 14px; color: #e8eaed; margin-bottom: 15px; font-weight: 500; }
+        
+        .p-avatar-large {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, var(--primary-green), #60a5fa);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; font-weight: 700; color: #fff;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        
+        .p-camera-icon {
+            position: absolute; bottom: 0; right: 0;
+            width: 24px; height: 24px; background: #303134;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: #fff; border: 2px solid #202124;
+        }
+
+        .p-name { font-size: 22px; color: #e8eaed; margin-bottom: 20px; font-weight: 400; }
+        
+        .p-manage-btn {
+            border: 1px solid #5f6368;
+            border-radius: 100px;
+            padding: 10px 24px;
+            color: #8ab4f8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .p-manage-btn:hover { background: rgba(138, 180, 248, 0.08); }
+
+        .p-divider { width: 100%; height: 1px; background: #3c4043; margin-bottom: 15px; }
+        
+        .p-logout-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 12px 24px;
+            background: transparent;
+            border-radius: 8px;
+            color: #e8eaed;
+            text-decoration: none;
+            font-size: 14px;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .p-logout-btn:hover { background: #303134; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- SCAN CARD --- */
+        .scan-card {
+            background: linear-gradient(145deg, rgba(17, 22, 37, 0.95), rgba(17, 22, 37, 0.85)); 
+            backdrop-filter: blur(20px); 
+            border-radius: 20px; 
+            padding: 50px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05); 
+            width: 100%; 
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .scan-card::before { 
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 20px; padding: 1px; 
+            background: linear-gradient(135deg, rgba(101, 219, 160, 0.4), rgba(59, 130, 246, 0.3)); 
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); 
+            -webkit-mask-composite: xor; mask-composite: exclude; z-index: -1; opacity: 0.7; 
+        }
+
+        .icon-wrapper {
+            width: 80px; height: 80px; 
+            background: rgba(101, 219, 160, 0.1); 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            margin: 0 auto 20px;
+            box-shadow: 0 0 20px rgba(101, 219, 160, 0.2);
+            animation: pulse 3s infinite;
+        }
+        .icon-wrapper i { font-size: 36px; color: var(--primary-green); }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(101, 219, 160, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(101, 219, 160, 0); } 100% { box-shadow: 0 0 0 0 rgba(101, 219, 160, 0); } }
+
+        .scan-title { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .scan-desc { color: var(--text-sub); font-size: 15px; margin-bottom: 40px; line-height: 1.5; }
+
+        .input-group { position: relative; margin-bottom: 25px; text-align: left; }
+        .input-label { display: block; margin-bottom: 8px; color: var(--text-sub); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .url-input { 
+            width: 100%; padding: 16px 20px; 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; 
+            color: #fff; font-size: 16px; 
+            transition: all 0.3s;
+        }
+        .url-input:focus { 
+            outline: none; border-color: var(--primary-green); 
+            background: rgba(255, 255, 255, 0.08); 
+            box-shadow: 0 0 0 4px rgba(101, 219, 160, 0.15); 
+        }
+
+        .btn-scan { 
+            width: 100%; padding: 16px; 
+            background: linear-gradient(135deg, var(--primary-green), #3b82f6); 
+            color: #05080f; border: none; border-radius: 12px; 
+            font-size: 16px; font-weight: 700; cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            position: relative; overflow: hidden;
+        }
+        .btn-scan:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(101, 219, 160, 0.3); }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="light-effects">
+        <div class="light-orb light-orb-1"></div>
+        <div class="light-orb light-orb-2"></div>
+        <div class="light-beam light-beam-1"></div>
+        <div class="light-beam light-beam-2"></div>
+    </div>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <i class="fas fa-shield-alt"></i> &nbsp; VeriScope AI
+        </div>
+        <nav class="nav-menu">
+            <div class="nav-label">Main Menu</div>
+            <a href="{{ url_for('dashboard') }}" class="nav-link"><i class="fas fa-th-large"></i> &nbsp; Dashboard</a>
+            <a href="{{ url_for('scan') }}" class="nav-link active"><i class="fas fa-search"></i> &nbsp; New Scan</a>
+            <a href="{{ url_for('history') }}" class="nav-link"><i class="fas fa-history"></i> &nbsp; History Log</a>
+            
+            <div class="nav-label" style="margin-top: 30px;">System</div>
+            <a href="{{ url_for('settings') }}" class="nav-link"><i class="fas fa-cog"></i> &nbsp; Settings</a>
+            <a href="{{ url_for('logout') }}" class="nav-link" style="color: var(--danger-red);"><i class="fas fa-sign-out-alt"></i> &nbsp; Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <div style="position: relative;">
+                <div class="avatar" onclick="toggleProfile()">
+                    {% if session.username %}
+                        {{ session.username[0].upper() }}
+                    {% else %}
+                        U
+                    {% endif %}
+                </div>
+
+                <div class="profile-popup" id="profilePopup">
+                    <div class="p-email">{{ session.email if session.email else 'user@veriscope.local' }}</div>
+                    
+                    <div class="p-avatar-large">
+                        {% if session.username %}
+                            {{ session.username[0].upper() }}
+                        {% else %}
+                            U
+                        {% endif %}
+                        <div class="p-camera-icon"><i class="fas fa-camera"></i></div>
+                    </div>
+                    
+                    <div class="p-name">Hi, {{ session.user }}!</div>
+                    
+                    <a href="{{ url_for('settings') }}" class="p-manage-btn">Manage your Account</a>
+                    
+                    <div class="p-divider"></div>
+                    
+                    <a href="{{ url_for('logout') }}" class="p-logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Sign out
+                    </a>
+                    
+                    <div style="margin-top: 10px; font-size: 11px; color: #9aa0a6;">
+                        Privacy Policy • Terms of Service
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scan-card">
+            <div class="icon-wrapper"><i class="fas fa-shield-alt"></i></div>
+            <h1 class="scan-title">Target Analysis</h1>
+            <p class="scan-desc">Enter a website URL to initiate a deep forensic scan. <br>Our AI engine will analyze 60+ security parameters.</p>
+            
+            <form action="{{ url_for('scan') }}" method="POST">
+                <div class="input-group">
+                    <label class="input-label">Target URL</label>
+                    <input type="text" name="url" class="url-input" placeholder="https://example.com" required autocomplete="off">
+                </div>
+                <button type="submit" class="btn-scan">Initialize Scan <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // TOGGLE PROFILE POPUP
+        function toggleProfile() {
+            const popup = document.getElementById('profilePopup');
+            if (popup.style.display === 'flex') {
+                popup.style.display = 'none';
+            } else {
+                popup.style.display = 'flex';
+            }
+        }
+
+        // Close popup when clicking outside
+        window.onclick = function(event) {
+            const popup = document.getElementById('profilePopup');
+            // Check if the click is NOT on the avatar and NOT inside the popup
+            if (!event.target.closest('.avatar') && !event.target.closest('.profile-popup')) {
+                if (popup) popup.style.display = "none";
+            }
+        }
+
+        // 3D Card Effect
+        const card = document.querySelector('.scan-card');
+        const container = document.querySelector('.main-content');
+
+        if (card && container) {
+            container.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = container.getBoundingClientRect();
+                const x = (e.clientX - left) / width - 0.5;
+                const y = (e.clientY - top) / height - 0.5;
+                card.style.transform = `rotateX(${y * -4}deg) rotateY(${x * 4}deg) perspective(1000px)`;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                card.style.transform = 'rotateX(0) rotateY(0) perspective(1000px)';
+                card.style.transition = 'transform 0.5s ease';
+            });
+            
+            container.addEventListener('mouseenter', () => {
+                card.style.transition = 'none';
+            });
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriScope AI - Threat Detection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #05080f;
+            --card-bg: #111625;
+            --primary-green: #00dc82;
+            --danger-red: #ff4b4b;
+            --text-main: #ffffff;
+            --text-sub: #94a3b8;
+            --border-color: #1e293b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            width: 100%;
+            padding: 15px 20px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .brand {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .alert-icon {
+            font-size: 24px;
+            color: #f59e0b;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 480px; /* Mobile app width */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Input Card */
+        .search-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px;
+            background: #0b0f19;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .search-input:focus { border-color: var(--primary-green); }
+
+        .btn-analyze {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-green);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        /* Result Card */
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Dynamic Status Colors */
+        .status-safe .status-text { color: var(--primary-green); }
+        .status-safe .badge { background: rgba(0, 220, 130, 0.1); color: var(--primary-green); }
+        .status-safe .left-bar { border-left: 4px solid var(--primary-green); }
+        
+        .status-danger .status-text { color: var(--danger-red); }
+        .status-danger .badge { background: rgba(255, 75, 75, 0.1); color: var(--danger-red); }
+        .status-danger .left-bar { border-left: 4px solid var(--danger-red); }
+
+        /* Header Row */
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .probability {
+            text-align: right;
+        }
+        .prob-label { font-size: 10px; color: var(--text-sub); display: block; }
+        .prob-val { font-size: 18px; font-weight: 700; }
+
+        /* Main Status */
+        .main-status {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+            letter-spacing: -1px;
+        }
+
+        .description {
+            padding-left: 15px;
+            color: var(--text-sub);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        /* 4-Grid Layout */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .info-box {
+            background: #181e2f;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .info-icon { font-size: 16px; margin-bottom: 8px; color: var(--text-sub); }
+        .info-label { font-size: 10px; color: var(--text-sub); text-transform: uppercase; display: block; margin-bottom: 4px;}
+        .info-value { font-size: 14px; font-weight: 600; color: white; }
+
+        /* Footer Actions */
+        .safe-banner {
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(0, 220, 130, 0.05);
+            border: 1px solid rgba(0, 220, 130, 0.2);
+            color: var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .danger-banner {
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 75, 75, 0.05);
+            border: 1px solid rgba(255, 75, 75, 0.2);
+            color: var(--danger-red);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .action-row {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 15px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-solid {
+            background: var(--primary-green);
+            border: none;
+            color: #000;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-solid.danger { background: var(--danger-red); color: white; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="brand">VeriScope AI-Threat Detection</div>
+        <div class="alert-icon"><i class="fas fa-shield-halved"></i></div>
+    </div>
+
+    <div class="container">
+        
+        <div class="search-card">
+            <form method="POST">
+                <input type="text" name="url" class="search-input" placeholder="Google.com" required>
+                <button type="submit" class="btn-analyze">ANALYZE</button>
+            </form>
+        </div>
+
+        {% if result %}
+        <div class="result-card {% if result.status == 'SAFE' %}status-safe{% else %}status-danger{% endif %}">
+            
+            <div class="result-header">
+                <div class="badge">
+                    {% if result.status == 'SAFE' %}SAFETY VERIFIED{% else %}THREAT DETECTED{% endif %}
+                </div>
+                <div class="probability">
+                    <span class="prob-label">THREAT PROBABILITY</span>
+                    <span class="prob-val status-text">
+                        {% if result.status == 'SAFE' %}0%{% else %}98%{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <h1 class="main-status status-text">
+                {% if result.status == 'SAFE' %}SECURE{% else %}UNSAFE{% endif %}
+            </h1>
+
+            <div class="description left-bar">
+                {{ result.message }}
+            </div>
+
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-icon"><i class="far fa-clock"></i></div>
+                    <span class="info-label">DOMAIN AGE</span>
+                    <span class="info-value">{{ result.age }}</span>
+                </div>
+                
+                <div class="info-box">
+                    <div class="info-icon"><i class="fas fa-lock"></i></div>
+                    <span class="info-label">SSL ISSUER</span>
+                    <span class="info-value">
+                        {% if result.status == 'SAFE' %}Valid (Trust){% else %}Unknown{% endif %}
+                    </span>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-icon"><i class="fas fa-font"></i></div>
+                    <span class="info-label">TYPOSQUATTING</span>
+                    <span class="info-value">
+                        {% if result.status == 'SAFE' %}Clean{% else %}Detected{% endif %}
+                    </span>
+                </div>
+
+                <div class="info-box">
+                    <div class="info-icon"><i class="fas fa-globe"></i></div>
+                    <span class="info-label">GLOBAL RANK</span>
+                    <span class="info-value">
+                        {% if result.status == 'SAFE' %}Top 1M{% else %}Unranked{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            {% if result.status == 'SAFE' %}
+            <div class="safe-banner">
+                <i class="fas fa-check-circle"></i> Safe to proceed.
+            </div>
+            {% else %}
+            <div class="danger-banner">
+                <i class="fas fa-exclamation-triangle"></i> Do not visit this site.
+            </div>
+            {% endif %}
+
+            <div class="action-row">
+                <a href="/" style="text-decoration: none;">
+                    <button class="btn-outline" style="width: 100%;">NEW SCAN</button>
+                </a>
+                
+                {% if result.status == 'SAFE' %}
+                    <a href="http://{{ result.domain }}" target="_blank" style="text-decoration: none;">
+                        <button class="btn-solid" style="width: 100%;">VISIT SITE</button>
+                    </a>
+                {% else %}
+                    <a href="/download_report/{{ result.id }}" style="text-decoration: none;">
+                        <button class="btn-solid danger" style="width: 100%;">GET REPORT</button>
+                    </a>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endif %}
+
+    </div>
+
+</body>
+</html>

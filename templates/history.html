@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VeriScope AI | History</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0b1120;
+            --bg-panel: #1e293b;
+            --primary: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; margin: 0; }
+
+        .sidebar { width: 260px; background: rgba(15,23,42,0.95); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+        .logo-area { padding: 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 20px; }
+        .nav-menu { padding: 24px 16px; flex: 1; }
+        .nav-label { font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin: 12px 0 12px 12px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 14px; color: var(--text-muted); text-decoration: none; border-radius: 10px; margin-bottom: 4px; font-weight: 500; transition: 0.3s; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: #fff; transform: translateX(5px); }
+        @keyframes pulse-blue { 0%{box-shadow:0 0 0 0 rgba(59,130,246,0.4);}70%{box-shadow:0 0 0 10px rgba(59,130,246,0);}100%{box-shadow:0 0 0 0 rgba(59,130,246,0);} }
+        .nav-link.active { background: linear-gradient(90deg,rgba(59,130,246,0.15),transparent); color: var(--primary); border-left: 3px solid var(--primary); animation: pulse-blue 2s infinite; }
+
+        .main-content { flex: 1; margin-left: 260px; padding: 32px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        .page-title h2 { margin: 0; font-size: 24px; font-weight: 700; }
+        .page-title p { margin: 4px 0 0; color: var(--text-muted); font-size: 14px; }
+        .user-profile { display: flex; align-items: center; gap: 12px; background: var(--bg-panel); padding: 8px 16px; border-radius: 50px; border: 1px solid var(--border); }
+
+        .card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); border-color: rgba(59,130,246,0.3); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 18px 24px; color: var(--text-muted); font-size: 11px; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+        td { padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.02); font-size: 14px; color: var(--text-main); vertical-align: middle; transition: background-color 0.2s; }
+        tr { transition: 0.2s; border-left: 3px solid transparent; }
+        tr:hover { background: rgba(59,130,246,0.05) !important; border-left: 3px solid var(--primary); }
+        tr:last-child td { border-bottom: none; }
+
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+        .status-safe    { background: rgba(16,185,129,0.15); color: var(--success); }
+        .status-danger  { background: rgba(239,68,68,0.15);  color: var(--danger); }
+        .status-warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+
+        .btn-icon { color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; background: transparent; border: 1px solid var(--border); text-decoration: none; }
+        .btn-icon:hover { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 0 10px rgba(59,130,246,0.5); transform: scale(1.1); }
+
+        .text-truncate { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
+        /* ══ GUEST LIMIT POPUP ══ */
+        #vs-limit-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(6px);z-index:99999;align-items:center;justify-content:center;}
+        #vs-limit-overlay.active{display:flex;}
+        .vs-lc{background:#0f172a;border:1px solid rgba(59,130,246,0.35);border-radius:20px;padding:44px 36px 36px;max-width:420px;width:90%;text-align:center;box-shadow:0 0 80px rgba(59,130,246,0.15);animation:vsPopIn .28s cubic-bezier(.34,1.56,.64,1) both;}
+        @keyframes vsPopIn{from{opacity:0;transform:scale(.88) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+        .vs-lc-icon{font-size:3rem;margin-bottom:16px;display:block;}
+        .vs-lc h2{color:#f1f5f9;font-size:1.4rem;font-weight:700;margin-bottom:10px;}
+        .vs-lc p{color:#94a3b8;font-size:.95rem;line-height:1.65;margin-bottom:28px;}
+        .vs-lc p strong{color:#f1f5f9;}
+        .vs-lc-btn{display:block;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-weight:700;font-size:1rem;padding:14px;border-radius:12px;text-decoration:none;margin-bottom:14px;transition:opacity .2s,transform .15s;box-shadow:0 4px 24px rgba(99,102,241,.35);}
+        .vs-lc-btn:hover{opacity:.88;transform:translateY(-2px);}
+        .vs-lc-reg{color:#64748b;font-size:.85rem;}
+        .vs-lc-reg a{color:#3b82f6;text-decoration:none;font-weight:600;}
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area"><i class="fas fa-shield-dog" style="color:var(--primary);"></i> VeriScope AI</div>
+        <nav class="nav-menu">
+            <div class="nav-label">MAIN MENU</div>
+            <a href="/dashboard" class="nav-link"><i class="fas fa-grid-2"></i> Dashboard</a>
+            <a href="/scan" class="nav-link"><i class="fas fa-radar"></i> New Scan</a>
+            <a href="/history" class="nav-link active"><i class="fas fa-history"></i> History Log</a>
+            <div class="nav-label" style="margin-top:24px;">SYSTEM</div>
+            <a href="/settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+            <a href="/logout" class="nav-link" style="color:var(--danger);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <div class="page-title">
+                <h2>Scan History</h2>
+                <p>Detailed logs of all past security analyses.</p>
+            </div>
+            <div class="user-profile">
+                <div style="text-align:right;">
+                    <div style="font-weight:600;font-size:14px;">{{ session.username }}</div>
+                    <div style="font-size:11px;color:var(--text-muted);">Security Analyst</div>
+                </div>
+                <div style="width:36px;height:36px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;box-shadow:0 0 10px rgba(59,130,246,0.5);">
+                    {{ session.username[0].upper() if session.get('username') else 'G' }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>TARGET URL</th>
+                        <th>STATUS</th>
+                        <th>RISK SCORE</th>
+                        <th>DATE & TIME</th>
+                        <th>ACTION</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scan in scans %}
+                    <tr>
+                        <td style="color:var(--text-muted);font-family:monospace;">#{{ scan[0] }}</td>
+                        <td>
+                            <div class="text-truncate" title="{{ scan[1] }}">
+                                <span style="color:#3b82f6;margin-right:6px;"><i class="fas fa-link"></i></span>
+                                {{ scan[1] }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if scan[2] == 'SAFE' %}
+                                <span class="status-badge status-safe"><i class="fas fa-check-circle"></i> SAFE</span>
+                            {% elif scan[2] == 'PHISHING' %}
+                                <span class="status-badge status-danger"><i class="fas fa-bug"></i> PHISHING</span>
+                            {% else %}
+                                <span class="status-badge status-warning"><i class="fas fa-exclamation-triangle"></i> SUSPICIOUS</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div style="width:60px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;">
+                                    <div style="width:{{ scan[3] }}%;height:100%;border-radius:2px;
+                                        background:{% if scan[3] > 70 %}var(--danger){% elif scan[3] > 40 %}var(--warning){% else %}var(--success){% endif %};
+                                        box-shadow:0 0 5px {% if scan[3] > 70 %}var(--danger){% elif scan[3] > 40 %}var(--warning){% else %}var(--success){% endif %};">
+                                    </div>
+                                </div>
+                                <span style="font-weight:700;font-size:13px;color:{% if scan[3] > 70 %}var(--danger){% elif scan[3] > 40 %}var(--warning){% else %}var(--success){% endif %};">
+                                    {{ scan[3] }}
+                                </span>
+                            </div>
+                        </td>
+                        <td style="color:var(--text-muted);">{{ scan[4] }}</td>
+                        <td>
+                            <a href="/download_enhanced_report/{{ scan[0] }}" target="_blank" class="btn-icon" title="Download Report">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">No scan history found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- ══ GUEST LIMIT POPUP ══ -->
+    <div id="vs-limit-overlay" role="dialog" aria-modal="true">
+        <div class="vs-lc">
+            <span class="vs-lc-icon">🔒</span>
+            <h2>Free Scan Limit Reached</h2>
+            <p>You've used your <strong>2 free scans</strong>.<br>
+            Log in for <strong>unlimited scans</strong>, full history, and forensic reports — all free.</p>
+            <a href="/login" class="vs-lc-btn"><i class="fas fa-sign-in-alt"></i>&nbsp; Login to Continue</a>
+            <p class="vs-lc-reg">No account yet? <a href="/register">Sign up free</a></p>
+        </div>
+    </div>
+
+    <script>
+        function vsShowLimitPopup() {
+            document.getElementById('vs-limit-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        document.getElementById('vs-limit-overlay').addEventListener('click', function(e) {
+            if (e.target === this) { this.classList.remove('active'); document.body.style.overflow = ''; }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') { document.getElementById('vs-limit-overlay').classList.remove('active'); document.body.style.overflow = ''; }
+        });
+
+        function getCookie(n) {
+            const v = document.cookie.split(';').find(c => c.trim().startsWith(n + '='));
+            return v ? parseInt(v.trim().split('=')[1]) : 0;
+        }
+
+        const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+        const limitHit   = getCookie('guest_scans') >= 2;
+
+        if (limitHit && !isLoggedIn) {
+            document.addEventListener('DOMContentLoaded', vsShowLimitPopup);
+            document.querySelectorAll('a[href="/scan"]').forEach(function(a) {
+                a.addEventListener('click', function(e) { e.preventDefault(); vsShowLimitPopup(); });
+            });
+        }
+    </script>
+</body>
+</html>

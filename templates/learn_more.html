@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriScope AI | Technology</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Professional Dark Theme */
+            --bg-body: #020617;       /* Deep Navy/Black */
+            --bg-section: #0f172a;    /* Slightly lighter for contrast */
+            --bg-card: #1e293b;       /* Card Background */
+            --primary: #3b82f6;       /* Brand Blue */
+            --secondary: #06b6d4;     /* Cyan Accent */
+            --success: #10b981;       /* Green */
+            --text-main: #f8fafc;     /* White text */
+            --text-muted: #94a3b8;    /* Grey text */
+            --border: rgba(255, 255, 255, 0.08);
+            --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 60px; background: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+        }
+
+        .brand { 
+            display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 700; color: #fff; text-decoration: none;
+        }
+        .brand i { color: var(--primary); font-size: 26px; }
+
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-link { color: var(--text-muted); text-decoration: none; font-size: 14px; font-weight: 600; transition: 0.3s; }
+        .nav-link:hover { color: #fff; }
+        .nav-btn {
+            background: var(--primary); color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.3s;
+        }
+        .nav-btn:hover { background: #2563eb; transform: translateY(-2px); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 180px 60px 100px;
+            text-align: center;
+            background: radial-gradient(circle at 50% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 56px; font-weight: 800; line-height: 1.1; margin-bottom: 24px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 18px; color: var(--text-muted); max-width: 700px; margin: 0 auto 40px;
+        }
+
+        /* --- PROCESS STEPS --- */
+        .section { padding: 100px 60px; max-width: 1400px; margin: 0 auto; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-size: 36px; font-weight: 700; margin-bottom: 16px; }
+        .section-header p { color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+        .steps-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+            position: relative;
+        }
+        
+        /* Connecting Line */
+        .steps-grid::before {
+            content: ''; position: absolute; top: 40px; left: 10%; right: 10%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            z-index: 0;
+        }
+
+        .step-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 40px; position: relative; z-index: 1;
+            text-align: center; transition: 0.3s;
+        }
+        .step-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+
+        .step-icon {
+            width: 70px; height: 70px; background: var(--bg-section);
+            border: 1px solid var(--border); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: var(--primary); margin: 0 auto 24px;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        .step-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; color: #fff; }
+        .step-card p { font-size: 14px; color: var(--text-muted); }
+
+        /* --- TECHNOLOGY GRID --- */
+        .tech-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px;
+        }
+
+        .tech-card {
+            background: var(--bg-section); border: 1px solid var(--border);
+            border-radius: 16px; padding: 32px; display: flex; align-items: start; gap: 20px;
+            transition: 0.3s;
+        }
+        .tech-card:hover { background: var(--bg-card); border-color: var(--secondary); }
+
+        .tech-icon {
+            min-width: 50px; height: 50px; background: rgba(6, 182, 212, 0.1);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            color: var(--secondary); font-size: 20px;
+        }
+
+        .tech-content h4 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+        .tech-content p { font-size: 14px; color: var(--text-muted); }
+
+        /* --- CTA SECTION --- */
+        .cta-section {
+            background: var(--gradient-blue); border-radius: 24px;
+            padding: 80px; text-align: center; margin: 100px 60px;
+            position: relative; overflow: hidden;
+        }
+        .cta-section h2 { font-size: 42px; font-weight: 800; color: #fff; margin-bottom: 20px; }
+        .cta-section p { font-size: 18px; color: rgba(255,255,255,0.9); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        
+        .btn-white {
+            background: #fff; color: var(--primary); padding: 16px 40px;
+            border-radius: 12px; text-decoration: none; font-weight: 700;
+            font-size: 16px; transition: 0.3s; display: inline-block;
+        }
+        .btn-white:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+
+        /* --- FOOTER --- */
+        footer {
+            border-top: 1px solid var(--border); padding: 60px; background: var(--bg-section);
+            text-align: center; color: var(--text-muted); font-size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="brand"><i class="fas fa-shield-dog"></i> VeriScope AI</a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/dashboard" class="nav-link">Dashboard</a>  <!-- ✅ FIXED: was /login -->
+            <a href="/scan" class="nav-btn">Start Scanning</a>   <!-- ✅ FIXED: was /login -->
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>The Science Behind<br>Digital Forensics</h1>
+        <p>VeriScope AI combines real-time heuristic analysis, global threat feeds, and machine learning to deconstruct URLs and expose hidden dangers instantly.</p>
+    </header>
+
+    <section class="section">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p>From URL submission to final verdict, our engine performs a comprehensive 3-stage audit.</p>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-search"></i></div>
+                <h3>1. Structural Analysis</h3>
+                <p>We parse the URL to identify obfuscation techniques, IP encoding, and typosquatting attempts (e.g., 'g0ogle.com') that mimic legitimate brands.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-database"></i></div>
+                <h3>2. Forensic Data Mining</h3>
+                <p>Our system queries global WHOIS databases, DNS records, and SSL certificate authorities to verify the domain's age, issuer, and ownership history.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-icon"><i class="fas fa-shield-check"></i></div>
+                <h3>3. Risk Scoring</h3>
+                <p>Using a weighted algorithm, we calculate a Threat Score (0-100) and generate a detailed report classifying the site as Safe, Suspicious, or Phishing.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: var(--bg-body);">
+        <div class="section-header">
+            <h2>Core Technologies</h2>
+            <p>Built for security professionals, developers, and proactive users.</p>
+        </div>
+
+        <div class="tech-grid">
+            <div class="tech-card">
+                <div class="tech-icon"><i class="fas fa-brain"></i></div>
+                <div class="tech-content">
+                    <h4>Heuristic Engine</h4>
+                    <p>Detects zero-day threats by analyzing patterns rather than relying solely on blacklists.</p>
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-icon"><i class="fas fa-lock"></i></div>
+                <div class="tech-content">
+                    <h4>SSL Verification</h4>
+                    <p>Validates the SSL/TLS certificate chain to ensure encrypted connections are genuine.</p>
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-icon"><i class="fas fa-history"></i></div>
+                <div class="tech-content">
+                    <h4>Domain Aging</h4>
+                    <p>Flags domains registered less than 30 days ago, a common indicator of "burner" phishing sites.</p>
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-icon"><i class="fas fa-network-wired"></i></div>
+                <div class="tech-content">
+                    <h4>IP Resolution</h4>
+                    <p>Resolves the hosting server's IP address to check against known botnet or malware blocklists.</p>
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-icon"><i class="fas fa-file-contract"></i></div>
+                <div class="tech-content">
+                    <h4>Compliance Reporting</h4>
+                    <p>Generates audit-ready PDF reports timestamped for forensic evidence and documentation.</p>
+                </div>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-icon"><i class="fas fa-bolt"></i></div>
+                <div class="tech-content">
+                    <h4>Real-Time Processing</h4>
+                    <p>Built on a high-speed Python backend to deliver analysis results in milliseconds.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <footer>
+        <p>&copy; 2026 VeriScope AI. Automated Cyber Security Forensics.</p>
+    </footer>
+
+</body>
+</html>
