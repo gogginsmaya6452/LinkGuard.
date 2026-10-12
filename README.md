@@ -1,6 +1,7 @@
-# VeriScope
+# LinkGuard - Phishing website Detection
 
-VeriScope is a phishing detection tool that helps users identify and avoid malicious URLs.
+ LinkGuard is a python-based web application designed to help users identify potentially
+ malicious URLs and improve their awereness of phishing threats
 
 ## Installation
 
