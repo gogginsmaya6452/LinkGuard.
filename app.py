@@ -291,10 +291,18 @@ def get_domain_age_raw(domain):
     return None
 
 
+def normalize_datetime_to_utc_naive(value):
+    """Convert aware datetimes to naive UTC for consistent subtraction."""
+    if value.tzinfo is not None and value.utcoffset() is not None:
+        return value.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+    return value
+
+
 def format_domain_age(creation_dt):
     if not creation_dt:
         return None
 
+    creation_dt = normalize_datetime_to_utc_naive(creation_dt)
     now = datetime.datetime.utcnow()
     delta = now - creation_dt
 
@@ -462,7 +470,7 @@ def run_analysis(raw_url):
 
     # ── Check 11: Very new domain ────────────────────────────────────────────
     if creation_dt:
-        age_days = (datetime.datetime.utcnow() - creation_dt).days
+        age_days = (datetime.datetime.utcnow() - normalize_datetime_to_utc_naive(creation_dt)).days
         if age_days < 365:
             threat_score += 30
             flags.append("Domain registered less than 1 year ago")
